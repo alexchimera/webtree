@@ -1,0 +1,22 @@
+# Local Postgres for development. The app itself runs on the host
+# (`npm run dev`) and connects via DATABASE_URL in .env.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: webtree-db
+    environment:
+      POSTGRES_USER: webtree
+      POSTGRES_PASSWORD: webtree
+      POSTGRES_DB: webtree
+    ports:
+      - "5432:5432"
+    volumes:
+      - webtree_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webtree"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  webtree_pg:
