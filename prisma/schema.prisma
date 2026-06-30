@@ -1,0 +1,21 @@
+// WebTree — Prisma schema
+// A document is a hierarchical TreeSheets grid serialized to JSON.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  title     String   @default("Untitled")
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([updatedAt])
+}
