@@ -198,6 +198,13 @@ body {
   /* nested grids: slightly smaller text, like TreeSheets depth scaling */
   font-size: 0.96em;
 }
+/* Top-level sections read as distinct, framed panels. */
+.wt-grid--root {
+  border: 1px solid var(--color-line-strong);
+}
+.wt-grid--root > tbody > tr > .wt-cell {
+  border-color: var(--color-line-strong);
+}
 
 .wt-cell {
   border: 1px solid var(--color-line);
@@ -232,6 +239,15 @@ body {
 .wt-cell-content .md-content {
   white-space: normal;
 }
+/* A cell that heads a sub-grid: emphasized label with a hairline separating it
+   from its nested content (clarifies parent -> children). */
+.wt-cell-content--head {
+  font-weight: 600;
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-line);
+  padding-bottom: 3px;
+  margin-bottom: 2px;
+}
 
 .wt-empty {
   color: var(--color-ink-muted);
@@ -247,7 +263,13 @@ body {
 }
 
 .wt-sub {
-  margin-top: 4px;
+  /* Indented branch with a connector "spine" + faint shading so each nesting
+     level reads as a contained plane. Alpha stacks with depth => deeper rows
+     get progressively more shaded, like the original TreeSheets. */
+  margin: 4px 0 2px 9px;
+  padding: 1px 0 1px 10px;
+  border-left: 1px solid var(--color-line-strong);
+  background: rgba(94, 200, 255, 0.025);
 }
 
 .wt-fold {

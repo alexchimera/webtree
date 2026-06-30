@@ -17,9 +17,20 @@ function cellTextStyle(cell: Cell): CSSProperties {
   };
 }
 
-export function GridView({ grid, path }: { grid: Grid; path: CellPath }) {
+export function GridView({
+  grid,
+  path,
+  depth = 0,
+}: {
+  grid: Grid;
+  path: CellPath;
+  depth?: number;
+}) {
   return (
-    <table className="wt-grid">
+    <table
+      className={depth === 0 ? "wt-grid wt-grid--root" : "wt-grid"}
+      data-depth={depth}
+    >
       <tbody>
         {grid.cells.map((row, r) => (
           <tr key={r}>
@@ -28,6 +39,7 @@ export function GridView({ grid, path }: { grid: Grid; path: CellPath }) {
                 key={cell.id}
                 cell={cell}
                 path={[...path, { row: r, col: c }]}
+                depth={depth}
               />
             ))}
           </tr>
@@ -37,7 +49,15 @@ export function GridView({ grid, path }: { grid: Grid; path: CellPath }) {
   );
 }
 
-function CellView({ cell, path }: { cell: Cell; path: CellPath }) {
+function CellView({
+  cell,
+  path,
+  depth,
+}: {
+  cell: Cell;
+  path: CellPath;
+  depth: number;
+}) {
   const selected = useDocStore((s) => pathsEqual(s.selection, path));
   const editing = useDocStore((s) => s.editing && pathsEqual(s.selection, path));
   const select = useDocStore((s) => s.select);
@@ -46,10 +66,11 @@ function CellView({ cell, path }: { cell: Cell; path: CellPath }) {
 
   const hasGrid = !!cell.grid;
   const folded = !!cell.folded;
+  const isHeader = hasGrid && !!cell.text?.trim();
 
   return (
     <td
-      className={`wt-cell${selected ? " is-selected" : ""}`}
+      className={`wt-cell${selected ? " is-selected" : ""}${hasGrid ? " has-sub" : ""}`}
       style={{ background: cell.style?.bg }}
       onMouseDown={(e) => {
         e.stopPropagation();
@@ -80,7 +101,10 @@ function CellView({ cell, path }: { cell: Cell; path: CellPath }) {
         {editing ? (
           <CellEditor path={path} value={cell.text} />
         ) : (
-          <div className="wt-cell-content" style={cellTextStyle(cell)}>
+          <div
+            className={`wt-cell-content${isHeader ? " wt-cell-content--head" : ""}`}
+            style={cellTextStyle(cell)}
+          >
             {cell.text?.trim() ? (
               <MarkdownText text={cell.text} />
             ) : !cell.image && !hasGrid ? (
@@ -95,7 +119,7 @@ function CellView({ cell, path }: { cell: Cell; path: CellPath }) {
 
         {hasGrid && !folded && (
           <div className="wt-sub">
-            <GridView grid={cell.grid!} path={path} />
+            <GridView grid={cell.grid!} path={path} depth={depth + 1} />
           </div>
         )}
         {hasGrid && folded && (
