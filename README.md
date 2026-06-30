@@ -83,13 +83,27 @@ both multi-column _and_ nested normalizes to an outline on re-import.
    DATABASE_URL=${{Postgres.DATABASE_URL}}
    ```
 
-4. Deploy. The start command runs `prisma migrate deploy` (applying
-   `prisma/migrations`) before booting Next.js. Healthcheck: `/api/health`.
+4. Deploy. The `preDeployCommand` runs `prisma migrate deploy` (applying
+   `prisma/migrations`); the service then boots Next.js. Healthcheck: `/api/health`.
 
 That's it — open the generated domain and create a document.
 
 > Images are stored inline as downscaled data URLs inside the document JSON, so
 > no object storage is required for v1.
+
+### Port / start command
+
+Next.js binds to Railway's injected `PORT` automatically, so the start command
+is just `npx next start -H 0.0.0.0` — **do not** add `-p ${PORT:-3000}`. Railway
+runs the start command without a shell, so `${PORT:-3000}` is passed to Next
+verbatim and fails with:
+
+```
+error: option '-p, --port <port>' argument '${PORT:-3000}' is invalid.
+```
+
+If you hit that, clear any **Custom Start Command** in the service settings (so
+`railway.json` is used) or set it to `npm start`.
 
 ## Project layout
 
